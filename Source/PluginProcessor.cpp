@@ -93,14 +93,13 @@ void JX11AudioProcessor::changeProgramName (int index, const juce::String& newNa
 //==============================================================================
 void JX11AudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    synth.allocateResources(sampleRate, samplesPerBlock);
+    reset();
 }
 
 void JX11AudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    synth.deallocateResources();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -179,6 +178,7 @@ void JX11AudioProcessor::splitBufferByEvents(juce::AudioBuffer<float>& buffer, j
 {
     int bufferOffset = 0;
     
+    // Loop through the MIDI messages, which are sorted by samplePosition.
     for (const auto metadata : midiMessages) {
         //Render the audio that happens before this event (if any).
         int samplesThisSegment = metadata.samplePosition - bufferOffset;
@@ -190,20 +190,21 @@ void JX11AudioProcessor::splitBufferByEvents(juce::AudioBuffer<float>& buffer, j
         // Handle the event. Ignore MIDI messages such as sysex.
         if (metadata.numBytes <= 3){
             uint8_t data1 = (metadata.numBytes >= 2) ? metadata.data[1] : 0;
-            uint8_t data2 = (metadata.numBytes >= 3) ? metadata.data[2] : 0;
+            uint8_t data2 = (metadata.numBytes == 3) ? metadata.data[2] : 0;
             handleMIDI(metadata.data[0], data1, data2);
         }
-        
-        // Render the audio after the last MIDI event. If there were no
-        // MIDI events at all, this renders the entire buffer
-        int samplesLastSegment = buffer.getNumSamples() - bufferOffset;
-        if(samplesLastSegment > 0) {
-            render(buffer, samplesLastSegment, bufferOffset);
-        }
-        
-        midiMessages.clear();
-        
     }
+    
+    // Render the audio after the last MIDI event. If there were no
+    // MIDI events at all, this renders the entire buffer
+    int samplesLastSegment = buffer.getNumSamples() - bufferOffset;
+    if (samplesLastSegment > 0) {
+        render(buffer, samplesLastSegment, bufferOffset);
+    }
+    
+    midiMessages.clear();
+        
+    
 }
 
 
@@ -212,9 +213,22 @@ void JX11AudioProcessor::handleMIDI(uint8_t data0, uint8_t data1, uint8_t data2)
     char s[16];
     snprintf(s, 16, "%02hhX %02hhX %02hhX", data0, data1, data2);
     DBG(s);
+    
+    synth.midiMessage(data0, data1, data2);
 }
 
 void JX11AudioProcessor::render(juce::AudioBuffer<float>& buffer, int sampleCount, int bufferOffset)
 {
-    //nothing for now
+    float* outputBuffers[2] = {nullptr, nullptr};
+    outputBuffers[0] = buffer.getWritePointer(0) + bufferOffset;
+    if (getTotalNumOutputChannels() > 1) {
+        outputBuffers[1] = buffer.getWritePointer(1) + bufferOffset;
+    }
+    
+    synth.render(outputBuffers, sampleCount);
+}
+
+void JX11AudioProcessor::reset()
+{
+    synth.reset();
 }
