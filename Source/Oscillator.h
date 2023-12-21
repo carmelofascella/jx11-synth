@@ -18,33 +18,52 @@ public:
     float amplitude;
     float inc;
     float phase;
-    float sin0;
-    float sin1;
-    float dsin;
+    
+    float freq;
+    float sampleRate;
+    float phaseBL;
     
     void reset()
     {
         phase = 0.0f;
+        phaseBL = -0.5f;
+    }
+    
+    float nextBandlimitedSample()
+    {
+        phaseBL += inc;
+        if (phaseBL >= 1.0f) {
+            phaseBL -= 1.0f;
+        }
         
-        // Digital resonator: optimized way to compute sin oscillator
-        sin0 = amplitude * std::sin(phase * TWO_PI);
-        sin1 = amplitude * std::sin((phase - inc) * TWO_PI);
-        dsin = 2.0f * std::cos(inc * TWO_PI);
+        float output = 0.0f;
+        float nyquist = sampleRate / 2.0f;
+        float h = freq;
+        float i = 1.0f;
+        float m = 0.6366197724f;
+        while (h < nyquist) {
+            output += m * std::sin(TWO_PI * phaseBL * i) / i;
+            h += freq;
+            i += 1.0f;
+            m = -m;
+        }
+        
+        return output;
     }
     
     float nextSample()
     {
+        /*
         phase += inc;
         if ( phase >= 1.0f ) {
             phase -= 1.0f;
         }
         
-        float sinx = dsin * sin0 - sin1;
-        sin1 = sin0;
-        sin0 = sinx;
+        float aliased = 2.0f * phase - 1.0f;
         
-        return sinx;
+        return amplitude * (aliased - nextBandlimitedSample());
+         */
         
-        //return amplitude * std::sin(TWO_PI * phase);
+        return amplitude * nextBandlimitedSample();
     }
 };
