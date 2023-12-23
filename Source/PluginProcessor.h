@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "Synth.h"
+#include "Preset.h"
 
 
 namespace ParameterID
@@ -112,6 +113,9 @@ private:
     }
     
     void update();
+    void createPrograms();
+    std::vector<Preset> presets;
+    int currentProgram;
     
     Synth synth;
     
