@@ -24,6 +24,9 @@ public:
     void reset();
     void render(float** outputBuffers, int sampleCount);
     void midiMessage(uint8_t data0, uint8_t data1, uint8_t data2);
+    
+    float noiseMix;
+    
 private:
     float sampleRate;
     Voice voice;
