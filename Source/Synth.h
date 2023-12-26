@@ -27,6 +27,11 @@ public:
     
     float noiseMix;
     
+    float envAttack;
+    float envDecay;
+    float envSustain;
+    float envRelease;
+    
 private:
     float sampleRate;
     Voice voice;
