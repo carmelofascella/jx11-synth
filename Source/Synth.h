@@ -32,6 +32,11 @@ public:
     float envSustain;
     float envRelease;
     
+    float oscMix;
+    float detune;
+    
+    float tune;
+    
 private:
     float sampleRate;
     Voice voice;
@@ -39,4 +44,6 @@ private:
     
     void noteOn(int note, int velocity);
     void noteOff(int note);
+    
+    float calcPeriod(int note) const;
 };

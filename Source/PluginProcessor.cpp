@@ -341,15 +341,20 @@ void JX11AudioProcessor::update()
         synth.envRelease = std::exp(-inverseSampleRate * std::exp(5.5f - 0.075f * envRelease));
     }
     
-    /*
-    float decayTime = envDecayParam->get() / 100.0f * 5.0f; //100% corresponds to decay time of 5 seconds
-    float decaySamples = sampleRate * decayTime; //decay in sample
-    synth.envDecay = std::exp(std::log(SILENCE) / decaySamples); //at the given sample rate, after decayTime, the exponential curve has dropped from the starting point 1.0f to the SILENCE value (which corresponds to -80dB)
-    */
-    
     float noiseMix = noiseParam->get() / 100.0f;
     noiseMix *= noiseMix;
     synth.noiseMix = noiseMix * 0.06f;
+    
+    synth.oscMix = oscMixParam->get() / 100.0f;
+    
+    float semi = oscTuneParam->get();
+    float cent = oscFineParam->get();
+    synth.detune = std::pow(1.059463094359f, -semi - 0.01f * cent);   //1.059463094359f is 2pow(1/12). minus because we are modyfing the period and not the pitch.
+    
+    float octave = octaveParam->get();
+    float tuning = tuningParam->get();
+    float tuneInSemi = -36.3763f - 12.0f * octave - tuning / 100.0f;        //optimization formula (pag 227).
+    synth.tune = sampleRate * std::exp(0.05776226505f * tuneInSemi);
 }
 
 //==============================================================================
