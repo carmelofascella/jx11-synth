@@ -19,12 +19,14 @@ public:
     float nextValue()
     {
         level = multiplier * (level - target) + target;
+        if (level + target > 3.0f) {
+            multiplier = decayMultiplier;
+            target = sustainLevel;
+        }
         return level;
     }
     
     float level;
-    float multiplier;
-    float target;
     
     float attackMultiplier;
     float decayMultiplier;
@@ -48,4 +50,20 @@ public:
     {
         return level > SILENCE;
     }
+    
+    inline bool isAttack() const
+    {
+        return target >= 2.0f;
+    }
+    
+    void attack()
+    {
+        level += SILENCE + SILENCE;
+        target = 2.0f;
+        multiplier = attackMultiplier;
+    }
+    
+private:
+    float target;
+    float multiplier;
 };

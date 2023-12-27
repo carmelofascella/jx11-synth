@@ -96,10 +96,9 @@ void Synth::noteOn(int note, int velocity)
     env.decayMultiplier = envDecay;
     env.sustainLevel = envSustain;
     env.releaseMultiplier = envRelease;
+    env.attack();
     
-    env.level = 1.0f;
-    env.target = env.sustainLevel;
-    env.multiplier = env.decayMultiplier;
+
     
 }
 
