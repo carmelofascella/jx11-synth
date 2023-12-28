@@ -11,10 +11,12 @@
 #include "Synth.h"
 
 static const float ANALOG = 0.002f;
+static const int SUSTAIN = -1;
 
 Synth::Synth()
 {
     sampleRate = 44100.0f;
+    sustainPedalPressed = false;
 }
 
 void Synth::allocateResources(double sampleRate_, int samplesPerBlock)
@@ -111,6 +113,10 @@ void Synth::midiMessage(uint8_t data0, uint8_t data1, uint8_t data2)
         case 0xE0:
             pitchBend = std::exp(-0.000014102f * float(data1 + 128 * data2 - 8192));    //map the first two bytes into a range of +/-2 semitones.
             break;
+        
+        // Control change
+        case 0xB0:
+            controlChange(data1, data2);
 
     }
 }
@@ -151,8 +157,13 @@ void Synth::noteOff(int note)
 {
     for (int v = 0; v < MAX_VOICES; ++v) {
         if (voices[v].note == note) {
-            voices[v].release();
-            voices[v].note = 0;
+            
+            if (sustainPedalPressed) {
+                voices[v].note = SUSTAIN;
+            } else {
+                voices[v].release();
+                voices[v].note = 0;
+            }
         }
     }
     
@@ -183,4 +194,29 @@ int Synth::findFreeVoice() const
     }
     
     return v;
+}
+
+
+void Synth::controlChange (uint8_t data1, uint8_t data2)
+{
+    switch (data1) {
+        //Sustain pedal
+        case 0x40:
+            sustainPedalPressed = (data2 >= 64);
+            
+            if (!sustainPedalPressed) {
+                noteOff(SUSTAIN);   //voices marked as sustain will be released.
+            }
+            break;
+        
+            //All notes off
+        default:
+            if (data1>= 0x78) {
+                for (int v = 0; v < MAX_VOICES; ++v) {
+                    voices[v].reset();
+                }
+                sustainPedalPressed = false;
+            }
+            break;
+    }
 }
