@@ -46,4 +46,6 @@ private:
     void noteOff(int note);
     
     float calcPeriod(int note) const;
+    
+    float pitchBend;
 };
