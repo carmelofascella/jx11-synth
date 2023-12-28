@@ -320,6 +320,7 @@ void JX11AudioProcessor::render(juce::AudioBuffer<float>& buffer, int sampleCoun
 void JX11AudioProcessor::reset()
 {
     synth.reset();
+    synth.outputLevelSmoother.setCurrentAndTargetValue(juce::Decibels::decibelsToGain(outputLevelParam->get()));
     
 }
 
@@ -357,6 +358,10 @@ void JX11AudioProcessor::update()
     synth.tune = sampleRate * std::exp(0.05776226505f * tuneInSemi);
     
     synth.numVoices = (polyModeParam->getIndex() == 0) ? 1 : Synth::MAX_VOICES;
+    
+    synth.volumeTrim = 0.0008f * (3.2f - synth.oscMix - 25.0f * synth.noiseMix) * 1.5f;
+    
+    synth.outputLevelSmoother.setTargetValue(juce::Decibels::decibelsToGain(outputLevelParam->get()));
 }
 
 //==============================================================================

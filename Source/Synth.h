@@ -40,6 +40,10 @@ public:
     static constexpr int MAX_VOICES = 8;
     int numVoices;
     
+    float volumeTrim;
+    
+    juce::LinearSmoothedValue<float> outputLevelSmoother;
+    
 private:
     float sampleRate;
     std::array<Voice, MAX_VOICES> voices;
@@ -61,4 +65,9 @@ private:
     bool sustainPedalPressed;
     
     void controlChange (uint8_t data1, uint8_t data2);
+    
+    void restartMonoVoice(int note, int velocity);
+    
+    void shiftQueuedNotes();
+    int nextQueuedNote();
 };

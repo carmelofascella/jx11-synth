@@ -36,6 +36,7 @@ void Synth::reset()
     }
     noiseGen.reset();
     pitchBend = 1.0f;
+    outputLevelSmoother.reset(sampleRate, 0.05);
 }
 
 void Synth::render(float** outputBuffers, int sampleCount)
@@ -66,8 +67,9 @@ void Synth::render(float** outputBuffers, int sampleCount)
             }
         }
         
-
-        
+        float outputLevel = outputLevelSmoother.getNextValue();
+        outputLeft *= outputLevel;
+        outputRight *= outputLevel;
         
         if(outputBufferRight != nullptr) {
             outputBufferLeft[sample] = outputLeft;
@@ -125,7 +127,13 @@ void Synth::noteOn(int note, int velocity)
 {
     int v = 0;  // index of the voice to use (0 = mono voice)
     
-    if (numVoices > 1) { // polyphonic
+    if (numVoices == 1) {
+        if (voices[0].note > 0) {
+            shiftQueuedNotes();
+            restartMonoVoice(note, velocity);
+            return;
+        }
+    } else {
         v = findFreeVoice();
     }
     
@@ -141,7 +149,7 @@ void Synth::startVoice(int v, int note, int velocity)
     voice.note = note;
     voice.updatePanning();
     
-    voice.osc1.amplitude = (velocity / 127.0f) * 0.5f;
+    voice.osc1.amplitude = volumeTrim * velocity;
     voice.osc2.amplitude = voice.osc1.amplitude * oscMix;
     
     Envelope& env = voice.env;
@@ -155,6 +163,14 @@ void Synth::startVoice(int v, int note, int velocity)
 
 void Synth::noteOff(int note)
 {
+    if ((numVoices == 1) && (voices[0].note == note)) {
+        int queuedNote = nextQueuedNote();
+        if (queuedNote > 0) {
+            restartMonoVoice(queuedNote, -1);
+        }
+    }
+    
+    
     for (int v = 0; v < MAX_VOICES; ++v) {
         if (voices[v].note == note) {
             
@@ -219,4 +235,40 @@ void Synth::controlChange (uint8_t data1, uint8_t data2)
             }
             break;
     }
+}
+
+void Synth::restartMonoVoice(int note, int velocity)
+{
+    float period = calcPeriod(0, note);
+    
+    Voice& voice = voices[0];
+    voice.period = period;
+    
+    voice.env.level += SILENCE + SILENCE;
+    voice.note = note;
+    voice.updatePanning();
+}
+
+void Synth::shiftQueuedNotes()
+{
+    for (int tmp = MAX_VOICES - 1; tmp > 0; tmp --) {
+        voices[tmp].note = voices[tmp-1].note;
+        voices[tmp].release();
+    }
+}
+
+int Synth::nextQueuedNote()
+{
+    int held = 0;
+    for (int v = MAX_VOICES -1; v > 0; v--) {
+        if (voices[v].note > 0) { held = v; }
+    }
+    
+    if (held > 0) {
+        int note = voices[held].note;
+        voices[held].note = 0;
+        return note;
+    }
+    
+    return 0;
 }
