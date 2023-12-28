@@ -10,6 +10,8 @@
 
 #include "Synth.h"
 
+static const float ANALOG = 0.002f;
+
 Synth::Synth()
 {
     sampleRate = 44100.0f;
@@ -27,7 +29,9 @@ void Synth::deallocateResources()
 
 void Synth::reset()
 {
-    voice.reset();
+    for (int v = 0; v < MAX_VOICES; ++v) {
+        voices[v].reset();
+    }
     noiseGen.reset();
     pitchBend = 1.0f;
 }
@@ -37,19 +41,30 @@ void Synth::render(float** outputBuffers, int sampleCount)
     float* outputBufferLeft = outputBuffers[0];
     float* outputBufferRight = outputBuffers[1];
     
-    voice.osc1.period = voice.period * pitchBend;
-    voice.osc2.period = voice.osc1.period * detune;
+    for (int v = 0; v < MAX_VOICES; ++v) {
+        Voice& voice = voices[v];
+        if (voice.env.isActive()) {
+            voice.osc1.period = voice.period * pitchBend;
+            voice.osc2.period = voice.osc1.period * detune;
+        }
+    }
+    
     
     for (int sample = 0; sample < sampleCount; ++sample) {
         float noise = noiseGen.nextValue() * noiseMix;
         
         float outputLeft = 0.0f;
         float outputRight = 0.0f;
-        if(voice.env.isActive()) {
-            float output = voice.render(noise);
-            outputLeft += output * voice.panLeft;
-            outputRight += output * voice.panRight;
+        for (int v = 0; v < MAX_VOICES; ++v) {
+            Voice& voice = voices[v];
+            if(voice.env.isActive()) {
+                float output = voice.render(noise);
+                outputLeft += output * voice.panLeft;
+                outputRight += output * voice.panRight;
+            }
         }
+        
+
         
         
         if(outputBufferRight != nullptr) {
@@ -61,8 +76,11 @@ void Synth::render(float** outputBuffers, int sampleCount)
         }
     }
     
-    if(!voice.env.isActive()){
-        voice.env.reset();
+    for (int v = 0; v < MAX_VOICES; ++v) {
+        Voice& voice = voices[v];
+        if(!voice.env.isActive()){
+            voice.env.reset();
+        }
     }
     
     protectYourEars(outputBufferLeft, sampleCount);
@@ -99,13 +117,23 @@ void Synth::midiMessage(uint8_t data0, uint8_t data1, uint8_t data2)
 
 void Synth::noteOn(int note, int velocity)
 {
-    voice.note = note;
+    int v = 0;  // index of the voice to use (0 = mono voice)
     
-    voice.updatePanning();
+    if (numVoices > 1) { // polyphonic
+        v = findFreeVoice();
+    }
     
-    //float freq = 440.0f * std::exp2((float(note-69) + tune) / 12.0f);
-    float period = calcPeriod(note);
+    startVoice(v, note, velocity);
+}
+
+void Synth::startVoice(int v, int note, int velocity)
+{
+    float period = calcPeriod(v, note);
+    
+    Voice& voice = voices[v];
     voice.period = period;
+    voice.note = note;
+    voice.updatePanning();
     
     voice.osc1.amplitude = (velocity / 127.0f) * 0.5f;
     voice.osc2.amplitude = voice.osc1.amplitude * oscMix;
@@ -117,26 +145,42 @@ void Synth::noteOn(int note, int velocity)
     env.releaseMultiplier = envRelease;
     env.attack();
     
-    
-    
-
-    
 }
 
 void Synth::noteOff(int note)
 {
-    if(voice.note == note) {
-        voice.release();
+    for (int v = 0; v < MAX_VOICES; ++v) {
+        if (voices[v].note == note) {
+            voices[v].release();
+            voices[v].note = 0;
+        }
     }
+    
+
 }
 
-float Synth::calcPeriod(int note) const
+float Synth::calcPeriod(int v, int note) const
 {
-    float period = tune * std::exp(-0.05776226505f * float(note));  //optimization formula
+    float period = tune * std::exp(-0.05776226505f * (float(note) + ANALOG * float(v)));  //optimization formula
     
     //Ensure period is at least 6 samples long for BLIT-based osc reliability. Highest pitch reachable is sampleRate / 6 samples
     while(period < 6.0f || (period * detune) < 6.0f ) { period += period ;}
     
     
     return period;
+}
+
+int Synth::findFreeVoice() const
+{
+    int v = 0;
+    float l = 100.0f;   //louder than any envelope
+    
+    for (int i=0; i < MAX_VOICES; ++i) {
+        if (voices[i].env.level < l && !voices[i].env.isInAttack() ) {
+            l = voices[i].env.level;
+            v = i;
+        }
+    }
+    
+    return v;
 }

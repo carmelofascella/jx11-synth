@@ -37,15 +37,24 @@ public:
     
     float tune;
     
+    static constexpr int MAX_VOICES = 8;
+    int numVoices;
+    
 private:
     float sampleRate;
-    Voice voice;
+    std::array<Voice, MAX_VOICES> voices;
     NoiseGenerator noiseGen;
     
     void noteOn(int note, int velocity);
+    Voice& voice = voices[0];
     void noteOff(int note);
     
-    float calcPeriod(int note) const;
+
+    float calcPeriod(int v, int note) const;
     
     float pitchBend;
+    
+    void startVoice(int v, int note, int velocity);
+    
+    int findFreeVoice() const;
 };
