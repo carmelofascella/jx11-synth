@@ -52,6 +52,8 @@ public:
     
     float vibrato;
     
+    float pwmDepth;
+    
 private:
     float sampleRate;
     std::array<Voice, MAX_VOICES> voices;

@@ -161,6 +161,10 @@ void Synth::startVoice(int v, int note, int velocity)
     voice.osc1.amplitude = volumeTrim * vel;
     voice.osc2.amplitude = voice.osc1.amplitude * oscMix;
     
+    if(vibrato == 0.0f && pwmDepth > 0.0f) {
+        voice.osc2.squareWave(voice.osc1, voice.period);
+    }
+    
     Envelope& env = voice.env;
     env.attackMultiplier = envAttack;
     env.decayMultiplier = envDecay;
@@ -293,12 +297,13 @@ void Synth::updateLFO()
         const float sine = std::sin(lfo);
         
         float vibratoMod = 1.0f + sine * vibrato;
+        float pwm = 1.0f + sine * pwmDepth;
         
         for (int v = 0; v < MAX_VOICES; ++v) {
             Voice& voice = voices[v];
             if (voice.env.isActive()) {
                 voice.osc1.modulation = vibratoMod;
-                voice.osc2.modulation = vibratoMod;
+                voice.osc2.modulation = pwm;
             }
         }
         
