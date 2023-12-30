@@ -44,6 +44,14 @@ public:
     
     juce::LinearSmoothedValue<float> outputLevelSmoother;
     
+    float velocitySensitivity;
+    bool ignoreVelocity;
+    
+    const int LFO_MAX = 32; //how often the LFO is updated;
+    float lfoInc; //phase increment for the lfo
+    
+    float vibrato;
+    
 private:
     float sampleRate;
     std::array<Voice, MAX_VOICES> voices;
@@ -70,4 +78,9 @@ private:
     
     void shiftQueuedNotes();
     int nextQueuedNote();
+    
+    void updateLFO();
+    
+    int lfoStep;
+    float lfo;
 };

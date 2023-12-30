@@ -362,6 +362,23 @@ void JX11AudioProcessor::update()
     synth.volumeTrim = 0.0008f * (3.2f - synth.oscMix - 25.0f * synth.noiseMix) * 1.5f;
     
     synth.outputLevelSmoother.setTargetValue(juce::Decibels::decibelsToGain(outputLevelParam->get()));
+    
+    float filterVelocity = filterVelocityParam->get();
+    if(filterVelocity < -90.0f) {
+        synth.velocitySensitivity = 0.0f;
+        synth.ignoreVelocity = true;
+    } else {
+        synth.velocitySensitivity = 0.0005f * filterVelocity;
+        synth.ignoreVelocity = false;
+    }
+    
+    const float inverseUpdateRate = inverseSampleRate * synth.LFO_MAX;
+    
+    float lfoRate = std::exp(7.0f * lfoRateParam->get() - 4.0f);        //skew mapping of [0,1] of the input param into [0.0183, 20.086] Hz
+    synth.lfoInc = lfoRate * inverseUpdateRate * float(TWO_PI);
+    
+    float vibrato = vibratoParam->get() / 200.0f;
+    synth.vibrato = 0.2f * vibrato * vibrato;
 }
 
 //==============================================================================

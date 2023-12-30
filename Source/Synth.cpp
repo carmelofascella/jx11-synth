@@ -37,6 +37,9 @@ void Synth::reset()
     noiseGen.reset();
     pitchBend = 1.0f;
     outputLevelSmoother.reset(sampleRate, 0.05);
+    
+    lfo = 0.0f;
+    lfoStep = 0;
 }
 
 void Synth::render(float** outputBuffers, int sampleCount)
@@ -54,6 +57,8 @@ void Synth::render(float** outputBuffers, int sampleCount)
     
     
     for (int sample = 0; sample < sampleCount; ++sample) {
+        updateLFO();
+        
         float noise = noiseGen.nextValue() * noiseMix;
         
         float outputLeft = 0.0f;
@@ -125,6 +130,8 @@ void Synth::midiMessage(uint8_t data0, uint8_t data1, uint8_t data2)
 
 void Synth::noteOn(int note, int velocity)
 {
+    if (ignoreVelocity) { velocity = 80; }
+    
     int v = 0;  // index of the voice to use (0 = mono voice)
     
     if (numVoices == 1) {
@@ -149,7 +156,9 @@ void Synth::startVoice(int v, int note, int velocity)
     voice.note = note;
     voice.updatePanning();
     
-    voice.osc1.amplitude = volumeTrim * velocity;
+    float vel = 0.004f * float((velocity + 64) * (velocity + 64)) - 8.0f; //logarithmic mapping of velocity.
+    
+    voice.osc1.amplitude = volumeTrim * vel;
     voice.osc2.amplitude = voice.osc1.amplitude * oscMix;
     
     Envelope& env = voice.env;
@@ -271,4 +280,27 @@ int Synth::nextQueuedNote()
     }
     
     return 0;
+}
+
+void Synth::updateLFO()
+{
+    if(--lfoStep <=0) {
+        lfoStep = LFO_MAX;
+        
+        lfo += lfoInc;
+        if (lfo > PI) { lfo -= TWO_PI; }
+        
+        const float sine = std::sin(lfo);
+        
+        float vibratoMod = 1.0f + sine * vibrato;
+        
+        for (int v = 0; v < MAX_VOICES; ++v) {
+            Voice& voice = voices[v];
+            if (voice.env.isActive()) {
+                voice.osc1.modulation = vibratoMod;
+                voice.osc2.modulation = vibratoMod;
+            }
+        }
+        
+    }
 }
