@@ -54,6 +54,10 @@ public:
     
     float pwmDepth;
     
+    int glideMode;
+    float glideRate;
+    float glideBend;
+    
 private:
     float sampleRate;
     std::array<Voice, MAX_VOICES> voices;
@@ -85,4 +89,16 @@ private:
     
     int lfoStep;
     float lfo;
+    
+    float modWheel;
+    
+    int lastNote;
+    
+    inline void updatePeriod(Voice& voice)
+    {
+        voice.osc1.period = voice.period * pitchBend;
+        voice.osc2.period = voice.osc1.period * detune;
+    }
+    
+    bool isPlayingLegatoStyle() const;
 };

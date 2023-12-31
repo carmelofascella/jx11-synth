@@ -382,6 +382,17 @@ void JX11AudioProcessor::update()
     
     synth.pwmDepth = synth.vibrato;
     if (vibrato < 0.0f) { synth.vibrato = 0.0f; }
+    
+    synth.glideMode = glideModeParam->getIndex();
+    
+    float glideRate = glideRateParam->get();
+    if (glideRate < 2.0f) {
+        synth.glideRate = 1.0f; //no glide
+    } else {
+        synth.glideRate = 1.0f - std::exp(-inverseUpdateRate * std::exp(6.0f - 0.07f * glideRate));
+    }
+    
+    synth.glideBend = glideBendParam->get();
 }
 
 //==============================================================================
