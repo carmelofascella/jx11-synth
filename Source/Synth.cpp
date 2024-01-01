@@ -22,6 +22,10 @@ Synth::Synth()
 void Synth::allocateResources(double sampleRate_, int samplesPerBlock)
 {
     sampleRate = static_cast<float>(sampleRate_);
+    
+    for (int v = 0; v < MAX_VOICES; ++v) {
+        voices[v].filter.sampleRate = sampleRate;
+    }
 }
 
 void Synth::deallocateResources()
@@ -41,8 +45,11 @@ void Synth::reset()
     lfo = 0.0f;
     lfoStep = 0;
     modWheel = 0.0;
-    
     lastNote = 0;
+    resonanctCtl = 1.0f;
+    pressure = 0.0f;
+    filterCtl = 0.0f;
+    filterZip = 0.0f;
 }
 
 void Synth::render(float** outputBuffers, int sampleCount)
@@ -55,9 +62,11 @@ void Synth::render(float** outputBuffers, int sampleCount)
         if (voice.env.isActive()) {
             updatePeriod(voice);
             voice.glideRate = glideRate;
+            voice.filterQ = filterQ * resonanctCtl;
+            voice.pitchBend = pitchBend;
+            voice.filterEnvDepth = filterEnvDepth;
         }
     }
-    
     
     for (int sample = 0; sample < sampleCount; ++sample) {
         updateLFO();
@@ -88,10 +97,13 @@ void Synth::render(float** outputBuffers, int sampleCount)
         }
     }
     
+    // Reset not active voices
     for (int v = 0; v < MAX_VOICES; ++v) {
         Voice& voice = voices[v];
         if(!voice.env.isActive()){
             voice.env.reset();
+            voice.filter.reset();
+            voice.filterQ = filterQ * resonanctCtl;
         }
     }
     
@@ -133,6 +145,10 @@ void Synth::midiMessage(uint8_t data0, uint8_t data1, uint8_t data2)
         case 0x01:
             modWheel = 0.000005f * float(data2 * data2);
             break;
+        
+        // Channel aftertouch
+        case 0xD0:
+            pressure = 0.0001f * float(data1 * data1);
 
     }
 }
@@ -188,12 +204,24 @@ void Synth::startVoice(int v, int note, int velocity)
         voice.osc2.squareWave(voice.osc1, voice.period);
     }
     
+    voice.cutoff = sampleRate / (period * PI);  //PI is an implementation choice of the author.
+    voice.cutoff *= std::exp(velocitySensitivity * float(velocity - 64));   //velociy influences brightness of the sound.
+    
+    // Amp envelope
     Envelope& env = voice.env;
     env.attackMultiplier = envAttack;
     env.decayMultiplier = envDecay;
     env.sustainLevel = envSustain;
     env.releaseMultiplier = envRelease;
     env.attack();
+    
+    // Filter envelope
+    Envelope& filterEnv = voice.filterEnv;
+    filterEnv.attackMultiplier = filterAttack;
+    filterEnv.decayMultiplier = filterDecay;
+    filterEnv.sustainLevel = filterSustain;
+    filterEnv.releaseMultiplier = filterRelease;
+    filterEnv.attack();
     
 }
 
@@ -261,7 +289,22 @@ void Synth::controlChange (uint8_t data1, uint8_t data2)
             }
             break;
         
-            //All notes off
+        // Resonance
+        case 0x47:
+            resonanctCtl = 154.0f / float(154 - data2);
+            break;
+        
+        // Filter +
+        case 0x4A:
+            filterCtl = 0.02f * float(data2);
+            break;
+            
+        // Filter -
+        case 0x4B:
+            filterCtl = -0.03f * float(data2);
+            break;
+
+        //All notes off
         default:
             if (data1>= 0x78) {
                 for (int v = 0; v < MAX_VOICES; ++v) {
@@ -285,6 +328,11 @@ void Synth::restartMonoVoice(int note, int velocity)
     voice.env.level += SILENCE + SILENCE;
     voice.note = note;
     voice.updatePanning();
+    
+    voice.cutoff = sampleRate / (period * PI);
+    if(velocity > 0) {
+        voice.cutoff *= std::exp(velocitySensitivity * float(velocity - 64));
+    }
 }
 
 void Synth::shiftQueuedNotes()
@@ -324,12 +372,16 @@ void Synth::updateLFO()
         float vibratoMod = 1.0f + sine * (modWheel + vibrato);
         float pwm = 1.0f + sine * (modWheel + pwmDepth);
         
+        float filterMod = filterKeyTracking + filterCtl + (filterLFODepth + pressure) * sine;
+        
+        filterZip += 0.005f * (filterMod - filterZip);
+        
         for (int v = 0; v < MAX_VOICES; ++v) {
             Voice& voice = voices[v];
             if (voice.env.isActive()) {
                 voice.osc1.modulation = vibratoMod;
                 voice.osc2.modulation = pwm;
-                
+                voice.filterMod = filterZip;
                 voice.updateLFO();
                 updatePeriod(voice);
             }
@@ -343,7 +395,7 @@ bool Synth::isPlayingLegatoStyle() const
 {
     int held = 0;
     for (int i=0; i<MAX_VOICES; ++i) {
-        if (voices[i].note > 0) { held += 1; }
+        if (voices[i].note > 0) { held += 1; }
     }
     return held > 0;
 }

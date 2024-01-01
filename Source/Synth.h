@@ -58,6 +58,15 @@ public:
     float glideRate;
     float glideBend;
     
+    float filterKeyTracking;
+    
+    float filterQ;
+    
+    float filterLFODepth;
+    
+    float filterAttack, filterDecay, filterSustain, filterRelease;
+    float filterEnvDepth;
+    
 private:
     float sampleRate;
     std::array<Voice, MAX_VOICES> voices;
@@ -101,4 +110,12 @@ private:
     }
     
     bool isPlayingLegatoStyle() const;
+    
+    float resonanctCtl;
+    
+    float pressure;
+    
+    float filterCtl;
+    
+    float filterZip;
 };

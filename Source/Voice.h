@@ -11,6 +11,7 @@
 #pragma once
 #include "Oscillator.h"
 #include "Envelope.h"
+#include "Filter.h"
 
 struct Voice
 {
@@ -28,6 +29,19 @@ struct Voice
     
     float glideRate;
     
+    Filter filter;
+    
+    float cutoff;
+    
+    float filterMod;
+    
+    float filterQ;
+    
+    float pitchBend;
+    
+    Envelope filterEnv;
+    float filterEnvDepth;
+    
     void reset()
     {
         note = 0;
@@ -37,15 +51,25 @@ struct Voice
         env.reset();
         panLeft = 0.707f;
         panRight = 0.707f;
+        filter.reset();
+        filterEnv.reset();
     }
     
     float render(float input)
     {
+        // Render the two oscillators
         float sample1 = osc1.nextSample();
         float sample2 = osc2.nextSample();
-        saw = saw * 0.997f + sample1 - sample2;
         
+        // Comine them into a single wave
+        saw = saw * 0.997f + sample1 - sample2;
+
         float output = saw + input;
+        
+        // Filter the sound
+        output = filter.render(output);
+        
+        // Apply the envelope
         float envelope = env.nextValue();
         return output * envelope;
         //return envelope;
@@ -54,6 +78,7 @@ struct Voice
     void release()
     {
         env.release();
+        filterEnv.release();
     }
     
     void updatePanning()
@@ -66,5 +91,12 @@ struct Voice
     void updateLFO()
     {
         period += glideRate * (target - period);
+        
+        float fenv = filterEnv.nextValue();
+        
+        float modulatedCutoff = cutoff * std::exp(filterMod + filterEnvDepth * fenv) / pitchBend;  //makes cutoff higher or lower, relative to the midi-note dependent one, and according to the filter envelope.
+        
+        modulatedCutoff = std::clamp(modulatedCutoff, 30.0f, 20000.0f); //limit cutoff between 30 and 20k hz
+        filter.updateCoefficients(modulatedCutoff, filterQ);
     }
 };
