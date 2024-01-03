@@ -6,6 +6,13 @@
               pluginCode="JX11">
   <MAINGROUP id="HcM9ad" name="JX11">
     <GROUP id="{EDDD8443-FE77-6339-A5B9-09ECE7C6D9BD}" name="Source">
+      <GROUP id="{A43CC847-8456-60B1-C352-642D1933F452}" name="Resources">
+        <FILE id="Z7TW8D" name="Lato-Medium.ttf" compile="0" resource="1" file="../synth-plugin-book/Resources/Lato-Medium.ttf"/>
+      </GROUP>
+      <FILE id="wVSQyV" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/LookAndFeel.cpp"/>
+      <FILE id="GWYnJp" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
+      <FILE id="QRUYEo" name="RotaryKnob.cpp" compile="1" resource="0" file="Source/RotaryKnob.cpp"/>
+      <FILE id="boraHh" name="RotaryKnob.h" compile="0" resource="0" file="Source/RotaryKnob.h"/>
       <FILE id="w6jJuR" name="Filter.h" compile="0" resource="0" file="Source/Filter.h"/>
       <FILE id="Drz6yN" name="Envelope.h" compile="0" resource="0" file="Source/Envelope.h"/>
       <FILE id="cevFFQ" name="Preset.h" compile="0" resource="0" file="Source/Preset.h"/>
