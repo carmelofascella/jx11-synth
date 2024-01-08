@@ -6,6 +6,11 @@
               pluginCode="JX11">
   <MAINGROUP id="HcM9ad" name="JX11">
     <GROUP id="{EDDD8443-FE77-6339-A5B9-09ECE7C6D9BD}" name="Source">
+      <GROUP id="{78D9130C-BF49-A3B0-AAF0-5FACC8189680}" name="UI">
+        <FILE id="TgGwWg" name="AdsrComponent.cpp" compile="1" resource="0"
+              file="Source/AdsrComponent.cpp"/>
+        <FILE id="ciWJ6T" name="AdsrComponent.h" compile="0" resource="0" file="Source/AdsrComponent.h"/>
+      </GROUP>
       <GROUP id="{A43CC847-8456-60B1-C352-642D1933F452}" name="Resources">
         <FILE id="Z7TW8D" name="Lato-Medium.ttf" compile="0" resource="1" file="../synth-plugin-book/Resources/Lato-Medium.ttf"/>
       </GROUP>

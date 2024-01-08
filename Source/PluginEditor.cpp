@@ -11,7 +11,14 @@
 
 //==============================================================================
 JX11AudioProcessorEditor::JX11AudioProcessorEditor (JX11AudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p),
+audioProcessor (p),
+adsrComponent(audioProcessor.apvts,
+              ParameterID::envAttack,
+              ParameterID::envDecay,
+              ParameterID::envSustain,
+              ParameterID::envRelease)
+
 {
     outputLevelKnob.label = "Level";
     filterResoKnob.label = "Reso";
@@ -23,9 +30,11 @@ JX11AudioProcessorEditor::JX11AudioProcessorEditor (JX11AudioProcessor& p)
     addAndMakeVisible(filterResoKnob);
     addAndMakeVisible(polyModeButton);
     
+    addAndMakeVisible(adsrComponent);
+    
     juce::LookAndFeel::setDefaultLookAndFeel(&globalLNF);
     
-    setSize (600, 300);
+    setSize (800, 600);
 }
 
 JX11AudioProcessorEditor::~JX11AudioProcessorEditor()
@@ -50,4 +59,6 @@ void JX11AudioProcessorEditor::resized()
     
     polyModeButton.setSize(80, 30);
     polyModeButton.setCentrePosition(r.withX(r.getRight()).getCentre());
+    
+    adsrComponent.setBounds(outputLevelKnob.getX(), r.getHeight() + 50, 500, 200);
 }

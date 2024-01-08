@@ -12,6 +12,7 @@
 #include "PluginProcessor.h"
 #include "RotaryKnob.h"
 #include "LookAndFeel.h"
+#include "AdsrComponent.h"
 
 //==============================================================================
 /**
@@ -30,6 +31,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     JX11AudioProcessor& audioProcessor;
+    
+    AdsrComponent adsrComponent;
     
     using APVTS = juce::AudioProcessorValueTreeState;
     using SliderAttachment = APVTS::SliderAttachment;
