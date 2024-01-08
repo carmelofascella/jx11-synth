@@ -16,12 +16,18 @@ AdsrComponent::AdsrComponent(juce::AudioProcessorValueTreeState& apvts,
                              juce::ParameterID envAttackParamID,
                              juce::ParameterID envDecayParamID,
                              juce::ParameterID envSustainParamID,
-                             juce::ParameterID envReleaseParamID)
+                             juce::ParameterID envReleaseParamID,
+                             juce::String componentName)
 {
+
     envAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (apvts, envAttackParamID.getParamID(),  envAttackKnob.slider);
     envDecayAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (apvts, envDecayParamID.getParamID(),   envDecayKnob.slider);
     envSustainAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (apvts, envSustainParamID.getParamID(), envSustainKnob.slider);
     envReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment> (apvts, envReleaseParamID.getParamID(), envReleaseKnob.slider);
+
+    
+    this->componentName = {componentName};
+
     
     envAttackKnob.label = "Attack";
     envDecayKnob.label = "Decay";
@@ -48,7 +54,7 @@ void AdsrComponent::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.setFont (20.0f);
     // g.drawText (componentName, labelSpace.withX (5), juce::Justification::left);
-    g.drawText ("Envelope ADSR", labelSpace.withX (5), juce::Justification::left);
+    g.drawText (componentName, labelSpace.withX (5), juce::Justification::left);
     g.drawRoundedRectangle (bounds.toFloat(), 5.0f, 2.0f);
 }
 

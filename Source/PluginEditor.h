@@ -32,7 +32,8 @@ private:
     // access the processor object that created it.
     JX11AudioProcessor& audioProcessor;
     
-    AdsrComponent adsrComponent;
+    AdsrComponent envAdsrComponent;
+    AdsrComponent filterAdsrComponent;
     
     using APVTS = juce::AudioProcessorValueTreeState;
     using SliderAttachment = APVTS::SliderAttachment;

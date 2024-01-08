@@ -20,7 +20,12 @@
 class AdsrComponent  : public juce::Component
 {
 public:
-    AdsrComponent(juce::AudioProcessorValueTreeState&, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID);
+    AdsrComponent(juce::AudioProcessorValueTreeState&,
+                  juce::ParameterID,
+                  juce::ParameterID,
+                  juce::ParameterID,
+                  juce::ParameterID,
+                  juce::String);
     ~AdsrComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -42,6 +47,8 @@ private:
     std::unique_ptr<SliderAttachment> envReleaseAttachment;
     
     LookAndFeel globalLNF;
+    
+    juce::String componentName;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AdsrComponent)
 };
