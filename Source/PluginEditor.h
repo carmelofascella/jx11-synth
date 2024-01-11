@@ -14,6 +14,7 @@
 #include "LookAndFeel.h"
 #include "AdsrComponent.h"
 #include "FilterComponent.h"
+#include "OscComponent.h"
 
 //==============================================================================
 /**
@@ -36,18 +37,19 @@ private:
     AdsrComponent envAdsrComponent;
     AdsrComponent filterAdsrComponent;
     FilterComponent filterComponent;
+    OscComponent oscComponent;
     
     using APVTS = juce::AudioProcessorValueTreeState;
     using SliderAttachment = APVTS::SliderAttachment;
-    using ButtonAttachment = APVTS::ButtonAttachment;
+    //using ButtonAttachment = APVTS::ButtonAttachment;
     
     RotaryKnob outputLevelKnob;
     //RotaryKnob filterResoKnob;
-    juce::TextButton polyModeButton;
+    //juce::TextButton polyModeButton;
     
     SliderAttachment outputLevelAttachment { audioProcessor.apvts, ParameterID::outputLevel.getParamID(), outputLevelKnob.slider };
     //SliderAttachment filterResAttachment { audioProcessor.apvts, ParameterID::filterReso.getParamID(), filterResoKnob.slider };
-    ButtonAttachment polyModeAttachment { audioProcessor.apvts, ParameterID::polyMode.getParamID(), polyModeButton };
+    //ButtonAttachment polyModeAttachment { audioProcessor.apvts, ParameterID::polyMode.getParamID(), polyModeButton };
     
     LookAndFeel globalLNF;
 

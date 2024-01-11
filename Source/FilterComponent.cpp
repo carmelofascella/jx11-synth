@@ -29,8 +29,8 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
     
     this->componentName = {componentName};
     
-    filterFreqKnob.label = "Filter Freq";
-    filterResoKnob.label = "Filter Reso";
+    filterFreqKnob.label = "Cutoff";
+    filterResoKnob.label = "Resonance";
     filterEnvKnob.label = "Filter Env";
     filterLFOKnob.label = "Filter LFO";
     LFORateKnob.label = "LFO Rate";

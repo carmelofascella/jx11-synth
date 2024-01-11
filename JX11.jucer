@@ -14,6 +14,9 @@
               file="Source/FilterComponent.cpp"/>
         <FILE id="QvRguH" name="FilterComponent.h" compile="0" resource="0"
               file="Source/FilterComponent.h"/>
+        <FILE id="BAZdF2" name="OscComponent.cpp" compile="1" resource="0"
+              file="Source/OscComponent.cpp"/>
+        <FILE id="PXB7wN" name="OscComponent.h" compile="0" resource="0" file="Source/OscComponent.h"/>
       </GROUP>
       <GROUP id="{A43CC847-8456-60B1-C352-642D1933F452}" name="Resources">
         <FILE id="Z7TW8D" name="Lato-Medium.ttf" compile="0" resource="1" file="../synth-plugin-book/Resources/Lato-Medium.ttf"/>
