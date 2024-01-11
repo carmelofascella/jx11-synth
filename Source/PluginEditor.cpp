@@ -15,8 +15,8 @@ JX11AudioProcessorEditor::JX11AudioProcessorEditor (JX11AudioProcessor& p)
 audioProcessor (p),
 envAdsrComponent(audioProcessor.apvts, ParameterID::envAttack, ParameterID::envDecay, ParameterID::envSustain, ParameterID::envRelease, "Env ADSR"),
 filterAdsrComponent(audioProcessor.apvts, ParameterID::filterAttack, ParameterID::filterDecay, ParameterID::filterSustain, ParameterID::filterRelease, "Filter ADSR"),
-filterComponent(audioProcessor.apvts, ParameterID::filterFreq, ParameterID::filterReso, ParameterID::filterEnv, ParameterID::filterLFO, ParameterID::lfoRate, "Filter"),
-oscComponent(audioProcessor.apvts, ParameterID::polyMode, ParameterID::oscMix, ParameterID::oscFine, ParameterID::oscTune, "Oscillator")
+filterComponent(audioProcessor.apvts, ParameterID::filterFreq, ParameterID::filterReso, ParameterID::filterEnv, ParameterID::filterLFO, ParameterID::lfoRate, ParameterID::filterVelocity, "Filter"),
+oscComponent(audioProcessor.apvts, ParameterID::polyMode, ParameterID::oscMix, ParameterID::noise, ParameterID::oscFine, ParameterID::oscTune,  ParameterID::octave, ParameterID::tuning, "Oscillator")
 
 {
     outputLevelKnob.label = "Level";
@@ -36,7 +36,7 @@ oscComponent(audioProcessor.apvts, ParameterID::polyMode, ParameterID::oscMix, P
     
     juce::LookAndFeel::setDefaultLookAndFeel(&globalLNF);
     
-    setSize (1080, 600);
+    setSize (1080, 700);
 }
 
 JX11AudioProcessorEditor::~JX11AudioProcessorEditor()
@@ -62,8 +62,10 @@ void JX11AudioProcessorEditor::resized()
     //polyModeButton.setSize(80, 30);
     //polyModeButton.setCentrePosition(r.withX(r.getRight()).getCentre());
     
-    oscComponent.setBounds(outputLevelKnob.getRight() + 20, r.getY() - 20, 500, 200);
-    envAdsrComponent.setBounds(outputLevelKnob.getX(), r.getHeight() + 80, 500, 200);
-    filterAdsrComponent.setBounds(envAdsrComponent.getRight() + 20, r.getHeight() + 80, 500, 200);
-    filterComponent.setBounds(envAdsrComponent.getX(), envAdsrComponent.getBottom() + 20, 650, 200);
+    oscComponent.setBounds(outputLevelKnob.getRight() + 20, r.getY() - 20, 850, 200);
+    envAdsrComponent.setBounds(outputLevelKnob.getX(), r.getHeight() + 100, 500, 200);
+    filterAdsrComponent.setBounds(envAdsrComponent.getRight() + 20, r.getHeight() + 100, 500, 200);
+    
+    filterComponent.setBounds(envAdsrComponent.getWidth()/3, envAdsrComponent.getBottom() + 20, 750, 200);
+    
 }

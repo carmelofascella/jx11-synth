@@ -18,6 +18,7 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
                                  juce::ParameterID filterEnvID,
                                  juce::ParameterID filterLFOID,
                                  juce::ParameterID LFORateID,
+                                 juce::ParameterID filterVelocityID,
                                  juce::String componentName)
 {
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
@@ -26,6 +27,7 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
     filterEnvAttachment = std::make_unique<SliderAttachment>(apvts, filterEnvID.getParamID(), filterEnvKnob.slider);
     filterLFOAttachment = std::make_unique<SliderAttachment>(apvts, filterLFOID.getParamID(), filterLFOKnob.slider);
     LFORateAttachment = std::make_unique<SliderAttachment>(apvts, LFORateID.getParamID(), LFORateKnob.slider);
+    filterVelocityAttachment = std::make_unique<SliderAttachment>(apvts, filterVelocityID.getParamID(), filterVelocityKnob.slider);
     
     this->componentName = {componentName};
     
@@ -34,12 +36,14 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
     filterEnvKnob.label = "Filter Env";
     filterLFOKnob.label = "Filter LFO";
     LFORateKnob.label = "LFO Rate";
+    filterVelocityKnob.label = "Velocity";
     
     addAndMakeVisible(filterFreqKnob);
     addAndMakeVisible(filterResoKnob);
     addAndMakeVisible(filterEnvKnob);
     addAndMakeVisible(filterLFOKnob);
     addAndMakeVisible(LFORateKnob);
+    addAndMakeVisible(filterVelocityKnob);
 
 }
 
@@ -76,5 +80,8 @@ void FilterComponent::resized()
     
     r = r.withX(r.getRight() + 20);
     LFORateKnob.setBounds(r);
+    
+    r = r.withX(r.getRight() + 20);
+    filterVelocityKnob.setBounds(r);
 
 }
