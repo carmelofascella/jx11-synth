@@ -15,6 +15,7 @@
 #include "AdsrComponent.h"
 #include "FilterComponent.h"
 #include "OscComponent.h"
+#include "ModComponent.h"
 
 //==============================================================================
 /**
@@ -38,6 +39,7 @@ private:
     AdsrComponent filterAdsrComponent;
     FilterComponent filterComponent;
     OscComponent oscComponent;
+    ModComponent modComponent;
     
     using APVTS = juce::AudioProcessorValueTreeState;
     using SliderAttachment = APVTS::SliderAttachment;

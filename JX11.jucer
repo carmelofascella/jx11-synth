@@ -14,6 +14,9 @@
               file="Source/FilterComponent.cpp"/>
         <FILE id="QvRguH" name="FilterComponent.h" compile="0" resource="0"
               file="Source/FilterComponent.h"/>
+        <FILE id="eJtKEG" name="ModComponent.cpp" compile="1" resource="0"
+              file="Source/ModComponent.cpp"/>
+        <FILE id="gPxacU" name="ModComponent.h" compile="0" resource="0" file="Source/ModComponent.h"/>
         <FILE id="BAZdF2" name="OscComponent.cpp" compile="1" resource="0"
               file="Source/OscComponent.cpp"/>
         <FILE id="PXB7wN" name="OscComponent.h" compile="0" resource="0" file="Source/OscComponent.h"/>

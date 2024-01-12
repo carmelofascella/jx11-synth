@@ -37,11 +37,11 @@ namespace ParameterID
     PARAMETER_ID(envSustain)
     PARAMETER_ID(envRelease)
     PARAMETER_ID(lfoRate)
-    PARAMETER_ID(vibrato)
-    PARAMETER_ID(noise)
-    PARAMETER_ID(octave)
-    PARAMETER_ID(tuning)
-    PARAMETER_ID(outputLevel)
+    PARAMETER_ID(vibrato)   
+    PARAMETER_ID(noise)     
+    PARAMETER_ID(octave)    
+    PARAMETER_ID(tuning)    
+    PARAMETER_ID(outputLevel)   //
     PARAMETER_ID(polyMode)
 
     #undef PARAMETER_ID
