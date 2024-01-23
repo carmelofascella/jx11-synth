@@ -41,7 +41,7 @@ namespace ParameterID
     PARAMETER_ID(noise)     
     PARAMETER_ID(octave)    
     PARAMETER_ID(tuning)    
-    PARAMETER_ID(outputLevel)   //
+    PARAMETER_ID(outputLevel)
     PARAMETER_ID(polyMode)
 
     #undef PARAMETER_ID

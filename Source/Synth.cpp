@@ -57,6 +57,7 @@ void Synth::render(float** outputBuffers, int sampleCount)
     float* outputBufferLeft = outputBuffers[0];
     float* outputBufferRight = outputBuffers[1];
     
+    // 1) Update parameters
     for (int v = 0; v < MAX_VOICES; ++v) {
         Voice& voice = voices[v];
         if (voice.env.isActive()) {
@@ -68,17 +69,18 @@ void Synth::render(float** outputBuffers, int sampleCount)
         }
     }
     
+    // 2) Update sample by sample values
     for (int sample = 0; sample < sampleCount; ++sample) {
         updateLFO();
         
-        float noise = noiseGen.nextValue() * noiseMix;
+        float noise = noiseGen.nextValue() * noiseMix;  //get next val of the noise
         
         float outputLeft = 0.0f;
         float outputRight = 0.0f;
         for (int v = 0; v < MAX_VOICES; ++v) {
             Voice& voice = voices[v];
             if(voice.env.isActive()) {
-                float output = voice.render(noise);
+                float output = voice.render(noise);     //oscillator rendering + sum of the noise.
                 outputLeft += output * voice.panLeft;
                 outputRight += output * voice.panRight;
             }
@@ -97,7 +99,7 @@ void Synth::render(float** outputBuffers, int sampleCount)
         }
     }
     
-    // Reset not active voices
+    // 3) Reset not active voices
     for (int v = 0; v < MAX_VOICES; ++v) {
         Voice& voice = voices[v];
         if(!voice.env.isActive()){
@@ -198,7 +200,7 @@ void Synth::startVoice(int v, int note, int velocity)
     float vel = 0.004f * float((velocity + 64) * (velocity + 64)) - 8.0f; //logarithmic mapping of velocity.
     
     voice.osc1.amplitude = volumeTrim * vel;
-    voice.osc2.amplitude = voice.osc1.amplitude * oscMix;
+    voice.osc2.amplitude = voice.osc1.amplitude * oscMix;   //the osc2 has the osc1 amplitude scaled by oscMix param.
     
     if(vibrato == 0.0f && pwmDepth > 0.0f) {
         voice.osc2.squareWave(voice.osc1, voice.period);
@@ -252,7 +254,7 @@ void Synth::noteOff(int note)
 
 float Synth::calcPeriod(int v, int note) const
 {
-    float period = tune * std::exp(-0.05776226505f * (float(note) + ANALOG * float(v)));  //optimization formula
+    float period = tune * std::exp(-0.05776226505f * (float(note) + ANALOG * float(v)));  //optimization formula, derived from 440Hz * 2^((note - 69)/12), grouping elements.
     
     //Ensure period is at least 6 samples long for BLIT-based osc reliability. Highest pitch reachable is sampleRate / 6 samples
     while(period < 6.0f || (period * detune) < 6.0f ) { period += period ;}

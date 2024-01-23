@@ -23,7 +23,7 @@ struct Voice
     
     float period;
     
-    float panLeft, panRight;
+    float panLeft, panRight;    //stereophonic spacing of the midi notes.
     
     float target;
     
@@ -57,11 +57,13 @@ struct Voice
     
     float render(float input)
     {
-        // Render the two oscillators
+        /* The input is the noise value */
+        
+        // Render the two oscillators: getting next sample
         float sample1 = osc1.nextSample();
         float sample2 = osc2.nextSample();
         
-        // Comine them into a single wave
+        // Combine the two oscillators into a single wave. The * 0.997f is to scale the harmonics of the BLIT in frequency, like the sawtooth oscillator (leaky integrator).
         saw = saw * 0.997f + sample1 - sample2;
 
         float output = saw + input;
@@ -83,7 +85,9 @@ struct Voice
     
     void updatePanning()
     {
-        float panning = std::clamp((note - 60.0f) / 24.0f, -1.0f, 1.0f);
+        /* Apply the -3d panning law */
+        
+        float panning = std::clamp((note - 60.0f) / 24.0f, -1.0f, 1.0f);    //value to space the midi note between -1 and 1. pan value for note 60 (middle C) is 0, so in the centre.
         panLeft = std::sin(PI_OVER_4 * (1.0f - panning));
         panRight = std::sin(PI_OVER_4 * (1.0f + panning));
     }

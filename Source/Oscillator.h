@@ -29,7 +29,7 @@ public:
         dc = 0.0f;
     }
 
-    
+    //This is the BLIT (bandlimited impulse train) implementation of the sawtooth.
     float nextSample()
     {
         float output = 0.0f;
@@ -45,6 +45,7 @@ public:
             inc = phaseMax / halfPeriod;
             phase = -phase;
 
+            //Thi is the optimized digital resonator implementation.
             sin0 = amplitude * std::sin(phase);
             sin1 = amplitude * std::sin(phase - inc);
             dsin = 2.0f * std::cos(inc);
@@ -67,7 +68,7 @@ public:
             output = sinp / phase;
         }
 
-        return output - dc;
+        return output - dc;     //remove DC offset
     }
     
     void squareWave(Oscillator& other, float newPeriod)

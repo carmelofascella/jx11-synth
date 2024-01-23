@@ -28,14 +28,13 @@ public:
     float noiseMix;
     
     float envAttack;
-    float envDecay;
+    float envDecay;     //value in samples of the decay Time. Calculated in update() in the processor.
     float envSustain;
     float envRelease;
     
-    float oscMix;
-    float detune;
-    
-    float tune;
+    float oscMix;   //how much the second oscillator is mixed in the final sound.
+    float detune;   //Osc2 detune: parameter that combines both Osc Tune (detune in semitons) and Osc Fine (detune in cents).
+    float tune;     //Global tuning: parameter that combines Octave (+-2 octs) and Tuning (+-100 cents) of the global sound.
     
     static constexpr int MAX_VOICES = 8;
     int numVoices;
@@ -105,8 +104,8 @@ private:
     
     inline void updatePeriod(Voice& voice)
     {
-        voice.osc1.period = voice.period * pitchBend;
-        voice.osc2.period = voice.osc1.period * detune;
+        voice.osc1.period = voice.period * pitchBend;   //pitch bend val is from the modulation wheel.
+        voice.osc2.period = voice.osc1.period * detune; //the period (and the pitch) of the second osc is a bit detuned from the first one. This is because, since we use subtractive synthesis, we don't want to cancels out the two synths.
     }
     
     bool isPlayingLegatoStyle() const;

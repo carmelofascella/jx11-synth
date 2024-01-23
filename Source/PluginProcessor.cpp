@@ -264,16 +264,16 @@ void JX11AudioProcessor::splitBufferByEvents(juce::AudioBuffer<float>& buffer, j
 {
     int bufferOffset = 0;
     
-    // Loop through the MIDI messages, which are sorted by samplePosition.
+    // Loop through the MIDI messages, which are sorted by samplePosition (timestamp = num of samples relative to the start of the buffer).
     for (const auto metadata : midiMessages) {
-        //Render the audio that happens before this event (if any).
+        //1) Render the audio that happens before this event (if any).
         int samplesThisSegment = metadata.samplePosition - bufferOffset;
         if (samplesThisSegment > 0) {
             render(buffer, samplesThisSegment, bufferOffset);
             bufferOffset += samplesThisSegment;
         }
         
-        // Handle the event. Ignore MIDI messages such as sysex.
+        // Handle the event -> set noteOn/noteOff or other event. Ignore MIDI messages such as sysex.
         if (metadata.numBytes <= 3){
             uint8_t data1 = (metadata.numBytes >= 2) ? metadata.data[1] : 0;
             uint8_t data2 = (metadata.numBytes == 3) ? metadata.data[2] : 0;
@@ -319,6 +319,7 @@ void JX11AudioProcessor::handleMIDI(uint8_t data0, uint8_t data1, uint8_t data2)
     snprintf(s, 16, "%02hhX %02hhX %02hhX", data0, data1, data2);
     DBG(s);
     
+    // Handle Midi Note
     synth.midiMessage(data0, data1, data2);
 }
 
@@ -366,7 +367,7 @@ void JX11AudioProcessor::update()
     
     float semi = oscTuneParam->get();
     float cent = oscFineParam->get();
-    synth.detune = std::pow(1.059463094359f, -semi - 0.01f * cent);   //1.059463094359f is 2pow(1/12). minus because we are modyfing the period and not the pitch.
+    synth.detune = std::pow(1.059463094359f, -semi - 0.01f * cent);   //1.059463094359f is 2pow(1/12). minus because we are modyfing the period and not the pitch. semi is in semitones, cents in cents. the total detune in semitones is: semi + cent/100.
     
     float octave = octaveParam->get();
     float tuning = tuningParam->get();
