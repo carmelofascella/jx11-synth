@@ -401,3 +401,11 @@ bool Synth::isPlayingLegatoStyle() const
     }
     return held > 0;
 }
+
+
+void Synth::updateStereoWidth(float stereoWidth)
+{
+    for (int i=0; i < MAX_VOICES; ++i){
+        voices[i].stereoWidth = stereoWidth;
+    }
+}

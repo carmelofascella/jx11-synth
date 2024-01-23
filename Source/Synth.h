@@ -24,6 +24,7 @@ public:
     void reset();
     void render(float** outputBuffers, int sampleCount);
     void midiMessage(uint8_t data0, uint8_t data1, uint8_t data2);
+    void updateStereoWidth(float stereoWidth);
     
     float noiseMix;
     
@@ -65,6 +66,8 @@ public:
     
     float filterAttack, filterDecay, filterSustain, filterRelease;
     float filterEnvDepth;
+    
+    float stereoWidth;
     
 private:
     float sampleRate;

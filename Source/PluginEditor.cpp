@@ -21,14 +21,12 @@ modComponent(audioProcessor.apvts, ParameterID::glideMode, ParameterID::glideRat
 
 {
     outputLevelKnob.label = "Level";
-    //filterResoKnob.label = "Reso";
+    stereoWidthKnob.label = "Stereo Width";
     
-    //polyModeButton.setButtonText("Poly");
-    //polyModeButton.setClickingTogglesState(true);
     
     addAndMakeVisible(outputLevelKnob);
-    //addAndMakeVisible(filterResoKnob);
-    //addAndMakeVisible(polyModeButton);
+    addAndMakeVisible(stereoWidthKnob);
+
     
     addAndMakeVisible(envAdsrComponent);
     addAndMakeVisible(filterAdsrComponent);
@@ -70,5 +68,7 @@ void JX11AudioProcessorEditor::resized()
     filterAdsrComponent.setBounds(envAdsrComponent.getRight() + 20, r.getHeight() + 100, 500, heightComp);
     filterComponent.setBounds(envAdsrComponent.getWidth()/3, envAdsrComponent.getBottom() + 20, 750, heightComp);
     modComponent.setBounds(getWidth()/3 - 30, filterComponent.getBottom()+20, 500, heightComp);
+    
+    stereoWidthKnob.setBounds(modComponent.getRight() + 10, (modComponent.getY() + modComponent.getHeight()/3 - 16) , 100, 120);
     
 }

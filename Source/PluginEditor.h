@@ -46,11 +46,10 @@ private:
     //using ButtonAttachment = APVTS::ButtonAttachment;
     
     RotaryKnob outputLevelKnob;
-    //RotaryKnob filterResoKnob;
-    //juce::TextButton polyModeButton;
+    RotaryKnob stereoWidthKnob;
     
     SliderAttachment outputLevelAttachment { audioProcessor.apvts, ParameterID::outputLevel.getParamID(), outputLevelKnob.slider };
-    //SliderAttachment filterResAttachment { audioProcessor.apvts, ParameterID::filterReso.getParamID(), filterResoKnob.slider };
+    SliderAttachment stereoWidthAttachment { audioProcessor.apvts, ParameterID::stereoWidth.getParamID(), stereoWidthKnob.slider };
     //ButtonAttachment polyModeAttachment { audioProcessor.apvts, ParameterID::polyMode.getParamID(), polyModeButton };
     
     LookAndFeel globalLNF;

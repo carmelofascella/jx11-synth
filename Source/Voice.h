@@ -42,6 +42,8 @@ struct Voice
     Envelope filterEnv;
     float filterEnvDepth;
     
+    float stereoWidth;      //parameter used to multiply the panning value. The higher, the more horizontally spatialized.
+    
     void reset()
     {
         note = 0;
@@ -88,8 +90,8 @@ struct Voice
         /* Apply the -3d panning law */
         
         float panning = std::clamp((note - 60.0f) / 24.0f, -1.0f, 1.0f);    //value to space the midi note between -1 and 1. pan value for note 60 (middle C) is 0, so in the centre.
-        panLeft = std::sin(PI_OVER_4 * (1.0f - panning));
-        panRight = std::sin(PI_OVER_4 * (1.0f + panning));
+        panLeft = std::sin(PI_OVER_4 * (1.0f - panning * stereoWidth));
+        panRight = std::sin(PI_OVER_4 * (1.0f + panning * stereoWidth));
     }
     
     void updateLFO()
