@@ -19,7 +19,7 @@ class Oscillator
 public:
     float period = 0.0f;
     float amplitude = 1.0f;
-    float modulation = 1.0f;
+    float modulation = 1.0f;        //current amount of modulation to apply to the period.
     
     
     void reset()

@@ -380,6 +380,7 @@ void JX11AudioProcessor::update()
     
     synth.outputLevelSmoother.setTargetValue(juce::Decibels::decibelsToGain(outputLevelParam->get()));
     
+    //used to change the dynamic range of the sound
     float filterVelocity = filterVelocityParam->get();
     if(filterVelocity < -90.0f) {
         synth.velocitySensitivity = 0.0f;
@@ -389,10 +390,10 @@ void JX11AudioProcessor::update()
         synth.ignoreVelocity = false;
     }
     
-    const float inverseUpdateRate = inverseSampleRate * synth.LFO_MAX;
+    const float inverseUpdateRate = inverseSampleRate * synth.LFO_MAX;  //sample rate of the LFO, it's LFO_MAX times lower than the audio block's sample rate
     
     float lfoRate = std::exp(7.0f * lfoRateParam->get() - 4.0f);        //skew mapping of [0,1] of the input param into [0.0183, 20.086] Hz
-    synth.lfoInc = lfoRate * inverseUpdateRate * float(TWO_PI);
+    synth.lfoInc = lfoRate * inverseUpdateRate * float(TWO_PI);         //update phase is 2pi * f / sample_rate = 2 pi * f * period of update
     
     float vibrato = vibratoParam->get() / 200.0f;
     synth.vibrato = 0.2f * vibrato * vibrato;

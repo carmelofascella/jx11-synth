@@ -40,17 +40,17 @@ public:
     static constexpr int MAX_VOICES = 8;
     int numVoices;
     
-    float volumeTrim;
+    float volumeTrim;   //used for gain compensation in different occasions, like when 2 osc are playing togheter with noise.
     
     juce::LinearSmoothedValue<float> outputLevelSmoother;
     
     float velocitySensitivity;
     bool ignoreVelocity;
     
-    const int LFO_MAX = 32; //how often the LFO is updated;
+    const int LFO_MAX = 32; //how often the LFO is updated, how many samples per second;
     float lfoInc; //phase increment for the lfo
     
-    float vibrato;
+    float vibrato;      //amount of vibrato
     
     float pwmDepth;
     

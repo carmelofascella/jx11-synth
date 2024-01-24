@@ -40,7 +40,7 @@ void Synth::reset()
     }
     noiseGen.reset();
     pitchBend = 1.0f;
-    outputLevelSmoother.reset(sampleRate, 0.05);
+    outputLevelSmoother.reset(sampleRate, 0.05);        //0.05 is the duration in seconds (50 ms) of the linear interpolation to go from old to new sample.
     
     lfo = 0.0f;
     lfoStep = 0;
@@ -163,8 +163,8 @@ void Synth::noteOn(int note, int velocity)
     
     if (numVoices == 1) {
         if (voices[0].note > 0) {
-            shiftQueuedNotes();
-            restartMonoVoice(note, velocity);
+            shiftQueuedNotes();                     //first shift all the notes
+            restartMonoVoice(note, velocity);       //then allocates the current received
             return;
         }
     } else {
@@ -197,7 +197,8 @@ void Synth::startVoice(int v, int note, int velocity)
     voice.note = note;
     voice.updatePanning();
     
-    float vel = 0.004f * float((velocity + 64) * (velocity + 64)) - 8.0f; //logarithmic mapping of velocity.
+    float vel = 0.004f * float((velocity + 64) * (velocity + 64)) - 8.0f; //logarithmic mapping of velocity. Formula chosen by the author.
+    //float sens = std::abs(velocitySensitivity) / 0.05;      //value between 0 and 1
     
     voice.osc1.amplitude = volumeTrim * vel;
     voice.osc2.amplitude = voice.osc1.amplitude * oscMix;   //the osc2 has the osc1 amplitude scaled by oscMix param.
@@ -229,6 +230,8 @@ void Synth::startVoice(int v, int note, int velocity)
 
 void Synth::noteOff(int note)
 {
+    
+    //In mono mode, check if the keys that got release is the current one and find if there is another currently pressed note to play.
     if ((numVoices == 1) && (voices[0].note == note)) {
         int queuedNote = nextQueuedNote();
         if (queuedNote > 0) {
@@ -240,7 +243,7 @@ void Synth::noteOff(int note)
     for (int v = 0; v < MAX_VOICES; ++v) {
         if (voices[v].note == note) {
             
-            if (sustainPedalPressed) {
+            if (sustainPedalPressed) {      //case we press the sustain pedal
                 voices[v].note = SUSTAIN;
             } else {
                 voices[v].release();
@@ -255,6 +258,9 @@ void Synth::noteOff(int note)
 float Synth::calcPeriod(int v, int note) const
 {
     float period = tune * std::exp(-0.05776226505f * (float(note) + ANALOG * float(v)));  //optimization formula, derived from 440Hz * 2^((note - 69)/12), grouping elements.
+    // ANALOG * v = a way to give a random detuning to the current pitch (1/period)
+    // ANALOG = Multiplying period for a ANALOG vibes, gives it a detune typical of analog instruments.
+    // v = index of the current voice.
     
     //Ensure period is at least 6 samples long for BLIT-based osc reliability. Highest pitch reachable is sampleRate / 6 samples
     while(period < 6.0f || (period * detune) < 6.0f ) { period += period ;}
@@ -265,11 +271,13 @@ float Synth::calcPeriod(int v, int note) const
 
 int Synth::findFreeVoice() const
 {
+    /* Algorithm used to solve the Voice Stealing */
+    
     int v = 0;
     float l = 100.0f;   //louder than any envelope
     
     for (int i=0; i < MAX_VOICES; ++i) {
-        if (voices[i].env.level < l && !voices[i].env.isInAttack() ) {
+        if (voices[i].env.level < l && !voices[i].env.isInAttack() ) {      //ignore voices in the attack stage
             l = voices[i].env.level;
             v = i;
         }
@@ -339,6 +347,8 @@ void Synth::restartMonoVoice(int note, int velocity)
 
 void Synth::shiftQueuedNotes()
 {
+    /* Shift all the voices to the right, starting from the one before the last one. It modifies only the note property. */
+    
     for (int tmp = MAX_VOICES - 1; tmp > 0; tmp --) {
         voices[tmp].note = voices[tmp-1].note;
         voices[tmp].release();
@@ -347,6 +357,7 @@ void Synth::shiftQueuedNotes()
 
 int Synth::nextQueuedNote()
 {
+    /* Find the first available note to play */
     int held = 0;
     for (int v = MAX_VOICES -1; v > 0; v--) {
         if (voices[v].note > 0) { held = v; }
@@ -363,11 +374,12 @@ int Synth::nextQueuedNote()
 
 void Synth::updateLFO()
 {
+    /* Called on every samples at the audio rate, but it handles the update only at LFO rate. (every LFO_MAX steps) */
     if(--lfoStep <=0) {
-        lfoStep = LFO_MAX;
+        lfoStep = LFO_MAX;  //reset step
         
-        lfo += lfoInc;
-        if (lfo > PI) { lfo -= TWO_PI; }
+        lfo += lfoInc;  //increment lfo phase
+        if (lfo > PI) { lfo -= TWO_PI; }        //phase kept between -+pi
         
         const float sine = std::sin(lfo);
         

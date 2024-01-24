@@ -12,7 +12,7 @@
 #include "OscComponent.h"
 
 //==============================================================================
-OscComponent::OscComponent(juce::AudioProcessorValueTreeState& apvts, juce::ParameterID polyModeID, juce::ParameterID oscMixID, juce::ParameterID noiseID, juce::ParameterID oscTuneID, juce::ParameterID oscCentID, juce::ParameterID octaveID, juce::ParameterID tuningID, juce::String componentName)
+OscComponent::OscComponent(juce::AudioProcessorValueTreeState& apvts, juce::ParameterID polyModeID, juce::ParameterID oscMixID, juce::ParameterID noiseID, juce::ParameterID oscCentID, juce::ParameterID oscTuneID, juce::ParameterID octaveID, juce::ParameterID tuningID, juce::String componentName)
 {
     //using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     //using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
