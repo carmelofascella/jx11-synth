@@ -73,6 +73,8 @@ public:
     
     void squareWave(Oscillator& other, float newPeriod)
     {
+        /* called when in PWN mode */
+        
         reset();
         
         if(other.inc > 0.0f) {

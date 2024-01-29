@@ -50,15 +50,16 @@ public:
     const int LFO_MAX = 32; //how often the LFO is updated, how many samples per second;
     float lfoInc; //phase increment for the lfo
     
+    //1) Vibrato: both oscillators are modulated
+    //2) PWM: only OSC2 is modulated back and forth at the LFO rate.
     float vibrato;      //amount of vibrato
-    
-    float pwmDepth;
+    float pwmDepth;     //amount of pwn
     
     int glideMode;
     float glideRate;
     float glideBend;
     
-    float filterKeyTracking;
+    float filterKeyTracking;      //corresponds to Filter Freq: it choose how strong is the filter key tracking.
     
     float filterQ;
     
@@ -68,6 +69,8 @@ public:
     float filterEnvDepth;
     
     float stereoWidth;
+    
+    int filterType;
     
 private:
     float sampleRate;
@@ -115,9 +118,9 @@ private:
     
     float resonanctCtl;
     
-    float pressure;
+    float pressure; //aftertouch (what happens when, after you press a key to play a note, you press it down even more.)
     
     float filterCtl;
     
-    float filterZip;
+    float filterZip;  //one pole filter used to smoothen the modulation amount for the cutoff freq.
 };

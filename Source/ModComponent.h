@@ -41,13 +41,13 @@ private:
     juce::ComboBox glideModeBox;
     RotaryKnob glideRateKnob;
     RotaryKnob glideBendKnob;
-    RotaryKnob vibratoKnob;
+    RotaryKnob filterVelocityKnob;
 
     //std::unique_ptr<ButtonAttachment> glideModeAttachment;
     std::unique_ptr<ComboBoxAttachment> glideModeAttachment;
     std::unique_ptr<SliderAttachment> glideRateAttachment;
     std::unique_ptr<SliderAttachment> glideBendAttachment;
-    std::unique_ptr<SliderAttachment> vibratoAttachment;
+    std::unique_ptr<SliderAttachment> filterVelocityAttachment;
 
     juce::String componentName;
     LookAndFeel globalLNF;

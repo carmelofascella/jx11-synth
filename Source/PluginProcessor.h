@@ -44,6 +44,7 @@ namespace ParameterID
     PARAMETER_ID(outputLevel)
     PARAMETER_ID(polyMode)
     PARAMETER_ID(stereoWidth)
+    PARAMETER_ID(filterType)
 
     #undef PARAMETER_ID
 }
@@ -147,6 +148,7 @@ private:
     juce::AudioParameterFloat* outputLevelParam;
     juce::AudioParameterChoice* polyModeParam;
     juce::AudioParameterFloat* stereoWidthParam;
+    juce::AudioParameterChoice* filterTypeParam;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JX11AudioProcessor)

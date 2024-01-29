@@ -25,11 +25,12 @@ struct Voice
     
     float panLeft, panRight;    //stereophonic spacing of the midi notes.
     
-    float target;
+    float target;   //target note to reach in glide mode.
     
     float glideRate;
     
     Filter filter;
+    FilterLadder filterLadder;
     
     float cutoff;
     
@@ -39,10 +40,12 @@ struct Voice
     
     float pitchBend;
     
-    Envelope filterEnv;
-    float filterEnvDepth;
+    Envelope filterEnv;     //filter ADSR
+    float filterEnvDepth;   //depth of the ENV filter.
     
     float stereoWidth;      //parameter used to multiply the panning value. The higher, the more horizontally spatialized.
+    
+    float filterType;
     
     void reset()
     {
@@ -54,6 +57,7 @@ struct Voice
         panLeft = 0.707f;
         panRight = 0.707f;
         filter.reset();
+        filterLadder.reset();
         filterEnv.reset();
     }
     
@@ -61,19 +65,19 @@ struct Voice
     {
         /* The input is the noise value */
         
-        // Render the two oscillators: getting next sample
+        // 1) Render the two oscillators: getting next sample
         float sample1 = osc1.nextSample();
         float sample2 = osc2.nextSample();
         
-        // Combine the two oscillators into a single wave. The * 0.997f is to scale the harmonics of the BLIT in frequency, like the sawtooth oscillator (leaky integrator).
+        // 2) Combine the two oscillators into a single wave. The * 0.997f is to scale the harmonics of the BLIT in frequency, like the sawtooth oscillator (leaky integrator).
         saw = saw * 0.997f + sample1 - sample2;
 
         float output = saw + input;
         
-        // Filter the sound
-        output = filter.render(output);
+        //3) Filter the sound
+        filterRender(output);
         
-        // Apply the envelope
+        // 4) Apply the envelope
         float envelope = env.nextValue();
         return output * envelope;
         //return envelope;
@@ -102,7 +106,20 @@ struct Voice
         
         float modulatedCutoff = cutoff * std::exp(filterMod + filterEnvDepth * fenv) / pitchBend;  //makes cutoff higher or lower, relative to the midi-note dependent one, and according to the filter envelope.
         
+        /* Update here the cutoff because it's every 32 samples (better for heavy math) */
         modulatedCutoff = std::clamp(modulatedCutoff, 30.0f, 20000.0f); //limit cutoff between 30 and 20k hz
         filter.updateCoefficients(modulatedCutoff, filterQ);
+        filterLadder.updateCoefficients(modulatedCutoff, filterQ);
+    }
+    
+    void filterRender(float& value)
+    {
+        if(filterType==0){
+            value = filter.render(value);
+        }
+        else if(filterType==1){
+            value = filterLadder.render(value);
+        }
+        
     }
 };

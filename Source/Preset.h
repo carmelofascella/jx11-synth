@@ -12,7 +12,7 @@
 
 #include <cstring>
 
-const int NUM_PARAMS = 27;
+const int NUM_PARAMS = 28;
 
 struct Preset
 {
@@ -23,7 +23,7 @@ struct Preset
            float p12, float p13, float p14, float p15,
            float p16, float p17, float p18, float p19,
            float p20, float p21, float p22, float p23,
-           float p24, float p25, float p26)
+           float p24, float p25, float p26, float p27)
     {
         strcpy(this->name, name);
         param[0]  = p0;   // Osc Mix
@@ -53,6 +53,7 @@ struct Preset
         param[24] = p24;  // Output Level
         param[25] = p25;  // Polyphony
         param[26] = p26;  // Stereo Width
+        param[27] = p27;  // Filter Type
     }
 
     char name[40];

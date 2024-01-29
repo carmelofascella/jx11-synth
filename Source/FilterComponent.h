@@ -20,7 +20,7 @@
 class FilterComponent  : public juce::Component
 {
 public:
-    FilterComponent(juce::AudioProcessorValueTreeState&, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::String);
+    FilterComponent(juce::AudioProcessorValueTreeState&, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::ParameterID, juce::String);
     ~FilterComponent() override;
 
     void paint (juce::Graphics&) override;
@@ -33,18 +33,20 @@ private:
     RotaryKnob filterEnvKnob;
     RotaryKnob filterLFOKnob;
     RotaryKnob LFORateKnob;
-    RotaryKnob filterVelocityKnob;
+    RotaryKnob vibratoKnob;
+    juce::ComboBox filterTypeBox;
     
     
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
     
     std::unique_ptr<SliderAttachment> filterFreqAttachment;
     std::unique_ptr<SliderAttachment> filterResoAttachment;
     std::unique_ptr<SliderAttachment> filterEnvAttachment;
     std::unique_ptr<SliderAttachment> filterLFOAttachment;
     std::unique_ptr<SliderAttachment> LFORateAttachment;
-    std::unique_ptr<SliderAttachment> filterVelocityAttachment;
-    
+    std::unique_ptr<SliderAttachment> vibratoAttachment;
+    std::unique_ptr<ComboBoxAttachment> filterTypeAttachment;
     
     juce::String componentName;
     

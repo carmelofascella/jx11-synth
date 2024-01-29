@@ -23,9 +23,22 @@ void Synth::allocateResources(double sampleRate_, int samplesPerBlock)
 {
     sampleRate = static_cast<float>(sampleRate_);
     
+    //allocate juce dsp building blocks
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 1;
+    
     for (int v = 0; v < MAX_VOICES; ++v) {
+        //SVF Cytomic
         voices[v].filter.sampleRate = sampleRate;
-    }
+        
+        //Ladder
+        voices[v].filterLadder.setMode(juce::dsp::LadderFilterMode::LPF12);
+        voices[v].filterLadder.prepare(spec);
+        voices[v].filterLadder.setDrive(1);
+        }
+    
 }
 
 void Synth::deallocateResources()
@@ -48,7 +61,7 @@ void Synth::reset()
     lastNote = 0;
     resonanctCtl = 1.0f;
     pressure = 0.0f;
-    filterCtl = 0.0f;
+    filterCtl = 0.0f;   //amount of filter cutoff modulation coming as midi CC from the keyboard.
     filterZip = 0.0f;
 }
 
@@ -66,6 +79,7 @@ void Synth::render(float** outputBuffers, int sampleCount)
             voice.filterQ = filterQ * resonanctCtl;
             voice.pitchBend = pitchBend;
             voice.filterEnvDepth = filterEnvDepth;
+            voice.filterType = filterType;
         }
     }
     
@@ -184,13 +198,14 @@ void Synth::startVoice(int v, int note, int velocity)
     int noteDistance = 0;
     if( lastNote > 0 ) {
         if((glideMode == 2) || ((glideMode == 1) && isPlayingLegatoStyle())) {
-            noteDistance = note - lastNote;
+            noteDistance = note - lastNote;     //calculate note distance between last note and the target if we are in glide mode.
         }
         
     }
     
-    voice.period = period * std::pow(1.059463094359f, float(noteDistance) - glideBend);
+    voice.period = period * std::pow(1.059463094359f, float(noteDistance) - glideBend);     //1.05.. is 2^(1/12), the rest is the n of semitones to go up or down from the starting period. The higher is glideBend, the longer it takes to reach the target.
     
+    //limit period to not be so small.
     if (voice.period < 6.0f) { voice.period = 6.0f; }
     
     lastNote = note;
@@ -208,7 +223,7 @@ void Synth::startVoice(int v, int note, int velocity)
     }
     
     voice.cutoff = sampleRate / (period * PI);  //PI is an implementation choice of the author.
-    voice.cutoff *= std::exp(velocitySensitivity * float(velocity - 64));   //velociy influences brightness of the sound.
+    voice.cutoff *= std::exp(velocitySensitivity * float(velocity - 64));   //velocity influences brightness of the sound. velocitySensitivity tells how much.
     
     // Amp envelope
     Envelope& env = voice.env;
@@ -386,9 +401,9 @@ void Synth::updateLFO()
         float vibratoMod = 1.0f + sine * (modWheel + vibrato);
         float pwm = 1.0f + sine * (modWheel + pwmDepth);
         
-        float filterMod = filterKeyTracking + filterCtl + (filterLFODepth + pressure) * sine;
+        float filterMod = filterKeyTracking + filterCtl + (filterLFODepth + pressure) * sine;   //multiple modulation sources affect the same target, and they are added togheter. (pressure is the aftertouch)
         
-        filterZip += 0.005f * (filterMod - filterZip);
+        filterZip += 0.005f * (filterMod - filterZip);      //smoothed version of filterMod (filter coeff hardcoded to 0.005)
         
         for (int v = 0; v < MAX_VOICES; ++v) {
             Voice& voice = voices[v];

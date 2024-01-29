@@ -16,7 +16,7 @@ ModComponent::ModComponent(juce::AudioProcessorValueTreeState& apvts,
                            juce::ParameterID glideModeID,
                            juce::ParameterID glideRateID,
                            juce::ParameterID glideBendID,
-                           juce::ParameterID vibratoID,
+                           juce::ParameterID filterVelocityID,
                            juce::String componentName)
 {
     
@@ -26,11 +26,11 @@ ModComponent::ModComponent(juce::AudioProcessorValueTreeState& apvts,
     glideModeAttachment = std::make_unique<ComboBoxAttachment>(apvts, glideModeID.getParamID(), glideModeBox);
     glideRateAttachment = std::make_unique<SliderAttachment>(apvts, glideRateID.getParamID(), glideRateKnob.slider);
     glideBendAttachment = std::make_unique<SliderAttachment>(apvts, glideBendID.getParamID(), glideBendKnob.slider);
-    vibratoAttachment = std::make_unique<SliderAttachment>(apvts, vibratoID.getParamID(), vibratoKnob.slider);
+    filterVelocityAttachment = std::make_unique<SliderAttachment>(apvts, filterVelocityID.getParamID(), filterVelocityKnob.slider);
     
     glideRateKnob.label = "Glide Rate";
     glideBendKnob.label = "Glide Bend";
-    vibratoKnob.label = "Vibrato";
+    filterVelocityKnob.label = "Velocity Sensitivity";
     
     //glideModeButton.setButtonText("Poly");
     //glideModeButton.setClickingTogglesState(true);
@@ -40,7 +40,7 @@ ModComponent::ModComponent(juce::AudioProcessorValueTreeState& apvts,
     addAndMakeVisible(glideModeBox);
     addAndMakeVisible(glideRateKnob);
     addAndMakeVisible(glideBendKnob);
-    addAndMakeVisible(vibratoKnob);
+    addAndMakeVisible(filterVelocityKnob);
 
 }
 
@@ -74,6 +74,6 @@ void ModComponent::resized()
     glideBendKnob.setBounds(r);
     
     r = r.withX(r.getRight() + 20);
-    vibratoKnob.setBounds(r);
+    filterVelocityKnob.setBounds(r);
     
 }

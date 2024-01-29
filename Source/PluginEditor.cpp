@@ -15,9 +15,9 @@ JX11AudioProcessorEditor::JX11AudioProcessorEditor (JX11AudioProcessor& p)
 audioProcessor (p),
 envAdsrComponent(audioProcessor.apvts, ParameterID::envAttack, ParameterID::envDecay, ParameterID::envSustain, ParameterID::envRelease, "Env ADSR"),
 filterAdsrComponent(audioProcessor.apvts, ParameterID::filterAttack, ParameterID::filterDecay, ParameterID::filterSustain, ParameterID::filterRelease, "Filter ADSR"),
-filterComponent(audioProcessor.apvts, ParameterID::filterFreq, ParameterID::filterReso, ParameterID::filterEnv, ParameterID::filterLFO, ParameterID::lfoRate, ParameterID::filterVelocity, "Filter"),
+filterComponent(audioProcessor.apvts, ParameterID::filterFreq, ParameterID::filterReso, ParameterID::filterEnv, ParameterID::filterLFO, ParameterID::lfoRate, ParameterID::vibrato, ParameterID::filterType, "Filter"),
 oscComponent(audioProcessor.apvts, ParameterID::polyMode, ParameterID::oscMix, ParameterID::noise, ParameterID::oscFine, ParameterID::oscTune,  ParameterID::octave, ParameterID::tuning, "Oscillator"),
-modComponent(audioProcessor.apvts, ParameterID::glideMode, ParameterID::glideRate, ParameterID::glideBend, ParameterID::vibrato, "Mod")
+modComponent(audioProcessor.apvts, ParameterID::glideMode, ParameterID::glideRate, ParameterID::glideBend, ParameterID::filterVelocity, "Mod")
 
 {
     outputLevelKnob.label = "Level";
@@ -66,7 +66,7 @@ void JX11AudioProcessorEditor::resized()
     oscComponent.setBounds(outputLevelKnob.getRight() + 20, r.getY() - 20, 850, heightComp);
     envAdsrComponent.setBounds(outputLevelKnob.getX(), r.getHeight() + 100, 500, heightComp);
     filterAdsrComponent.setBounds(envAdsrComponent.getRight() + 20, r.getHeight() + 100, 500, heightComp);
-    filterComponent.setBounds(envAdsrComponent.getWidth()/3, envAdsrComponent.getBottom() + 20, 750, heightComp);
+    filterComponent.setBounds(envAdsrComponent.getWidth()/3 - 50, envAdsrComponent.getBottom() + 20, 900, heightComp);
     modComponent.setBounds(getWidth()/3 - 30, filterComponent.getBottom()+20, 500, heightComp);
     
     stereoWidthKnob.setBounds(modComponent.getRight() + 10, (modComponent.getY() + modComponent.getHeight()/3 - 16) , 100, 120);
