@@ -18,7 +18,6 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
                                  juce::ParameterID filterEnvID,
                                  juce::ParameterID filterLFOID,
                                  juce::ParameterID LFORateID,
-                                 juce::ParameterID vibratoID,
                                  juce::ParameterID filterTypeID,
                                  juce::String componentName)
 {
@@ -28,7 +27,7 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
     filterEnvAttachment = std::make_unique<SliderAttachment>(apvts, filterEnvID.getParamID(), filterEnvKnob.slider);
     filterLFOAttachment = std::make_unique<SliderAttachment>(apvts, filterLFOID.getParamID(), filterLFOKnob.slider);
     LFORateAttachment = std::make_unique<SliderAttachment>(apvts, LFORateID.getParamID(), LFORateKnob.slider);
-    vibratoAttachment = std::make_unique<SliderAttachment>(apvts, vibratoID.getParamID(), vibratoKnob.slider);
+
     filterTypeAttachment = std::make_unique<ComboBoxAttachment>(apvts, filterTypeID.getParamID(), filterTypeBox);
 
     juce::StringArray choices { "SVF", "Ladder"};
@@ -41,14 +40,13 @@ FilterComponent::FilterComponent(juce::AudioProcessorValueTreeState& apvts,
     filterEnvKnob.label = "Filter Env";
     filterLFOKnob.label = "Filter LFO";
     LFORateKnob.label = "LFO Rate";
-    vibratoKnob.label = "Vibrato/PWM";
+
     
     addAndMakeVisible(filterFreqKnob);
     addAndMakeVisible(filterResoKnob);
     addAndMakeVisible(filterEnvKnob);
     addAndMakeVisible(filterLFOKnob);
     addAndMakeVisible(LFORateKnob);
-    addAndMakeVisible(vibratoKnob);
     addAndMakeVisible(filterTypeBox);
 
 }
@@ -92,8 +90,5 @@ void FilterComponent::resized()
     
     r = r.withX(r.getRight() + 20);
     LFORateKnob.setBounds(r);
-    
-    r = r.withX(r.getRight() + 20);
-    vibratoKnob.setBounds(r);
 
 }

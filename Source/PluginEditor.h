@@ -43,15 +43,7 @@ private:
     
     using APVTS = juce::AudioProcessorValueTreeState;
     using SliderAttachment = APVTS::SliderAttachment;
-    //using ButtonAttachment = APVTS::ButtonAttachment;
-    
-    RotaryKnob outputLevelKnob;
-    RotaryKnob stereoWidthKnob;
-    
-    SliderAttachment outputLevelAttachment { audioProcessor.apvts, ParameterID::outputLevel.getParamID(), outputLevelKnob.slider };
-    SliderAttachment stereoWidthAttachment { audioProcessor.apvts, ParameterID::stereoWidth.getParamID(), stereoWidthKnob.slider };
-    //ButtonAttachment polyModeAttachment { audioProcessor.apvts, ParameterID::polyMode.getParamID(), polyModeButton };
-    
+
     LookAndFeel globalLNF;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JX11AudioProcessorEditor)

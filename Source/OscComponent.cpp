@@ -12,11 +12,10 @@
 #include "OscComponent.h"
 
 //==============================================================================
-OscComponent::OscComponent(juce::AudioProcessorValueTreeState& apvts, juce::ParameterID polyModeID, juce::ParameterID oscMixID, juce::ParameterID noiseID, juce::ParameterID oscCentID, juce::ParameterID oscTuneID, juce::ParameterID octaveID, juce::ParameterID tuningID, juce::String componentName)
+OscComponent::OscComponent(juce::AudioProcessorValueTreeState& apvts, juce::ParameterID outputLevelID, juce::ParameterID polyModeID, juce::ParameterID oscMixID, juce::ParameterID noiseID, juce::ParameterID oscCentID, juce::ParameterID oscTuneID, juce::ParameterID octaveID, juce::ParameterID tuningID, juce::String componentName)
 {
-    //using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    //using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
-    
+
+    outputLevelAttachment = std::make_unique<SliderAttachment>(apvts, outputLevelID.getParamID(), outputLevelKnob.slider);
     polyModeAttachment = std::make_unique<ButtonAttachment>(apvts, polyModeID.getParamID(), polyModeButton);
     oscMixAttachment = std::make_unique<SliderAttachment>(apvts, oscMixID.getParamID(), oscMixKnob.slider);
     noiseAttachment = std::make_unique<SliderAttachment>(apvts, noiseID.getParamID(), noiseKnob.slider);
@@ -28,6 +27,7 @@ OscComponent::OscComponent(juce::AudioProcessorValueTreeState& apvts, juce::Para
     
     this->componentName = {componentName};
     
+    outputLevelKnob.label = "Level";
     oscMixKnob.label = "Osc Mix";
     oscTuneKnob.label = "Osc Detune Semi";
     oscCentKnob.label = "Osc Detune Cent";
@@ -35,9 +35,13 @@ OscComponent::OscComponent(juce::AudioProcessorValueTreeState& apvts, juce::Para
     octaveKnob.label = "Octave";
     tuningKnob.label = "Detune";
     
+    
+    
+    
     polyModeButton.setButtonText("Poly");
     polyModeButton.setClickingTogglesState(true);
     
+    addAndMakeVisible(outputLevelKnob);
     addAndMakeVisible(polyModeButton);
     addAndMakeVisible(oscMixKnob);
     addAndMakeVisible(noiseKnob);
@@ -68,15 +72,18 @@ void OscComponent::paint (juce::Graphics& g)
 void OscComponent::resized()
 {
     juce::Rectangle r(20, 50, 100, 120);
+    
     polyModeButton.setSize(80, 30);
-    //polyModeButton.setBounds(r);
     polyModeButton.setCentrePosition(r.getCentre());
     
     r = r.withX(r.getRight() + 20);
-    noiseKnob.setBounds(r);
+    outputLevelKnob.setBounds(r);
     
     r = r.withX(r.getRight() + 20);
     oscMixKnob.setBounds(r);
+    
+    r = r.withX(r.getRight() + 20);
+    noiseKnob.setBounds(r);
     
     r = r.withX(r.getRight() + 20);
     oscTuneKnob.setBounds(r);

@@ -17,6 +17,8 @@ ModComponent::ModComponent(juce::AudioProcessorValueTreeState& apvts,
                            juce::ParameterID glideRateID,
                            juce::ParameterID glideBendID,
                            juce::ParameterID filterVelocityID,
+                           juce::ParameterID vibratoID,
+                           juce::ParameterID stereoWidthID,
                            juce::String componentName)
 {
     
@@ -27,10 +29,14 @@ ModComponent::ModComponent(juce::AudioProcessorValueTreeState& apvts,
     glideRateAttachment = std::make_unique<SliderAttachment>(apvts, glideRateID.getParamID(), glideRateKnob.slider);
     glideBendAttachment = std::make_unique<SliderAttachment>(apvts, glideBendID.getParamID(), glideBendKnob.slider);
     filterVelocityAttachment = std::make_unique<SliderAttachment>(apvts, filterVelocityID.getParamID(), filterVelocityKnob.slider);
+    vibratoAttachment = std::make_unique<SliderAttachment>(apvts, vibratoID.getParamID(), vibratoKnob.slider);
+    stereoWidthAttachment = std::make_unique<SliderAttachment>(apvts, stereoWidthID.getParamID(), stereoWidthKnob.slider);
     
     glideRateKnob.label = "Glide Rate";
     glideBendKnob.label = "Glide Bend";
     filterVelocityKnob.label = "Velocity Sensitivity";
+    vibratoKnob.label = "PWM/Vibrato";
+    stereoWidthKnob.label = "Stereo Width";
     
     //glideModeButton.setButtonText("Poly");
     //glideModeButton.setClickingTogglesState(true);
@@ -41,6 +47,8 @@ ModComponent::ModComponent(juce::AudioProcessorValueTreeState& apvts,
     addAndMakeVisible(glideRateKnob);
     addAndMakeVisible(glideBendKnob);
     addAndMakeVisible(filterVelocityKnob);
+    addAndMakeVisible(vibratoKnob);
+    addAndMakeVisible(stereoWidthKnob);
 
 }
 
@@ -75,5 +83,11 @@ void ModComponent::resized()
     
     r = r.withX(r.getRight() + 20);
     filterVelocityKnob.setBounds(r);
+    
+    r = r.withX(r.getRight() + 20);
+    vibratoKnob.setBounds(r);
+    
+    r = r.withX(r.getRight() + 20);
+    stereoWidthKnob.setBounds(r);
     
 }

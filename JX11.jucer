@@ -22,6 +22,7 @@
         <FILE id="PXB7wN" name="OscComponent.h" compile="0" resource="0" file="Source/OscComponent.h"/>
       </GROUP>
       <GROUP id="{A43CC847-8456-60B1-C352-642D1933F452}" name="Resources">
+        <FILE id="XYkAPy" name="back_wavy.png" compile="0" resource="1" file="Resources/back_wavy.png"/>
         <FILE id="Z7TW8D" name="Lato-Medium.ttf" compile="0" resource="1" file="../synth-plugin-book/Resources/Lato-Medium.ttf"/>
       </GROUP>
       <FILE id="wVSQyV" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/LookAndFeel.cpp"/>

@@ -34,7 +34,7 @@ RotaryKnob::~RotaryKnob()
 
 void RotaryKnob::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
     
     g.setFont(15.0f);
     g.setColour (juce::Colours::white);

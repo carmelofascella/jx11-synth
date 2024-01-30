@@ -34,5 +34,7 @@
 
 *.rtf
 *.DS_Store
+
 Builds/
 JuceLibraryCode/
+Resources/

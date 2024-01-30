@@ -25,6 +25,8 @@ public:
                  juce::ParameterID,
                  juce::ParameterID,
                  juce::ParameterID,
+                 juce::ParameterID,
+                 juce::ParameterID,
                  juce::String);
     ~ModComponent() override;
 
@@ -37,17 +39,20 @@ private:
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     using ComboBoxAttachment = juce::AudioProcessorValueTreeState::ComboBoxAttachment;
     
-    //juce::TextButton glideModeButton;
     juce::ComboBox glideModeBox;
     RotaryKnob glideRateKnob;
     RotaryKnob glideBendKnob;
     RotaryKnob filterVelocityKnob;
+    RotaryKnob vibratoKnob;
+    RotaryKnob stereoWidthKnob;
 
-    //std::unique_ptr<ButtonAttachment> glideModeAttachment;
     std::unique_ptr<ComboBoxAttachment> glideModeAttachment;
     std::unique_ptr<SliderAttachment> glideRateAttachment;
     std::unique_ptr<SliderAttachment> glideBendAttachment;
     std::unique_ptr<SliderAttachment> filterVelocityAttachment;
+    std::unique_ptr<SliderAttachment> vibratoAttachment;
+    std::unique_ptr<SliderAttachment> stereoWidthAttachment;
+    
 
     juce::String componentName;
     LookAndFeel globalLNF;
