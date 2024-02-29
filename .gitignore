@@ -37,3 +37,8 @@
 
 Builds/
 JuceLibraryCode/
+
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
