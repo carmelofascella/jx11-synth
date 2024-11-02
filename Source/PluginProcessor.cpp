@@ -292,6 +292,7 @@ void JX11AudioProcessor::splitBufferByEvents(juce::AudioBuffer<float>& buffer, j
         render(buffer, samplesLastSegment, bufferOffset);
     }
     
+    //It lets JUCE know that all the MIDI events are consumed.
     midiMessages.clear();
         
     
